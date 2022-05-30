@@ -41,7 +41,7 @@ public class CMIConverter implements IConvertor {
         for(String name : config.getKeys(false)) {
             // Skip Auto-generated holograms to change pages.
             if(name.endsWith("#>") || name.endsWith("#<")) {
-                Common.tell(sender, "%s&7Skipping auto-generated Hologram '%s'...", Common.PREFIX, name);
+                Common.tell(sender, "%sSkipping auto-generated Hologram '%s'...", Common.PREFIX, name);
                 ++skipped;
                 continue;
             }

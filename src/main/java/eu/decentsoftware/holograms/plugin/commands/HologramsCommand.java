@@ -312,10 +312,8 @@ public class HologramsCommand extends DecentCommand {
                 }
                 
                 Common.tell(sender, "%s&aConversion complete!", Common.PREFIX);
-                Common.tell(sender, "%s&7Total: %d", Common.PREFIX, info.getTotal());
-                Common.tell(sender, "%s&aSuccessful: &7%d", Common.PREFIX, info.getConverted());
-                Common.tell(sender, "%s&eSkipped: &7%d", Common.PREFIX, info.getSkipped());
-                Common.tell(sender, "%s&cFailed: &7%d", Common.PREFIX, info.getFailed());
+                Common.tell(sender, "%s%d total converted [&a%a successful&7, &e%d skipped&7, &c%d failed&7]",
+                    Common.PREFIX, info.getTotal(), info.getConverted(), info.getSkipped(), info.getFailed());
                 return true;
             };
         }
