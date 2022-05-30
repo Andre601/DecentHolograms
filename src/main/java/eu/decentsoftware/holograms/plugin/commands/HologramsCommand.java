@@ -3,6 +3,8 @@ package eu.decentsoftware.holograms.plugin.commands;
 import com.google.common.collect.Lists;
 import eu.decentsoftware.holograms.api.Lang;
 import eu.decentsoftware.holograms.api.commands.*;
+import eu.decentsoftware.holograms.api.convertor.ConvertorInfo;
+import eu.decentsoftware.holograms.api.convertor.IConvertor;
 import eu.decentsoftware.holograms.api.holograms.Hologram;
 import eu.decentsoftware.holograms.api.utils.Common;
 import eu.decentsoftware.holograms.api.utils.message.Message;
@@ -270,40 +272,50 @@ public class HologramsCommand extends DecentCommand {
                     Common.tell(sender, "%s&cCannot convert Holograms! Unknown plugin '%s' provided", Common.PREFIX, args[0]);
                     return true;
                 }
-
+    
+                IConvertor convertor;
+                
                 switch (convertorType) {
-                    case HOLOGRAPHIC_DISPLAYS:
-                        Common.tell(sender, "%sConverting from %s", Common.PREFIX, convertorType.getName());
-                        if (path != null) {
-                            File file = new File(path);
-                            return new HolographicDisplaysConvertor().convert(file);
-                        } else {
-                            return new HolographicDisplaysConvertor().convert();
-                        }
+                    case CMI:
+                        convertor = new CMIConverter();
+                        break;
                     
                     case GHOLO:
-                        Common.tell(sender, "%sConverting from %s", Common.PREFIX, convertorType.getName());
-                        if (path != null) {
-                            File file = new File(path);
-                            return new GHoloConverter().convert(file);
-                        } else {
-                            return new GHoloConverter().convert();
-                        }
+                        convertor = new GHoloConverter();
+                        break;
                     
-                    case CMI:
-                        Common.tell(sender, "%sConverting from %s", Common.PREFIX, convertorType.getName());
-                        Common.tell(sender, "%sNOTE: CMI support is limited!", Common.PREFIX);
-                        if (path != null) {
-                            File file = new File(path);
-                            return new CMIConverter().convert(file);
-                        } else {
-                            return new CMIConverter().convert();
-                        }
-                        
+                    case HOLOGRAPHIC_DISPLAYS:
+                        convertor = new HolographicDisplaysConvertor();
+                        break;
+                    
                     default:
+                        convertor = null;
                         break;
                 }
-                Common.tell(sender, Common.PREFIX + "Plugin '" + args[0] + "' couldn't be found.");
+                
+                if (convertor == null) {
+                    Common.tell(sender, "%s&cUnsupported Plugin %s!", Common.PREFIX, args[0]);
+                    return false;
+                }
+                
+                Common.tell(sender, "%sStarting conversion of %s holograms", Common.PREFIX, convertorType.getName());
+                ConvertorInfo info;
+                if (path != null) {
+                    info = convertor.convert(sender, new File(path));
+                } else {
+                    info = convertor.convert(sender);
+                }
+                
+                if (!info.isSuccessful()) {
+                    Common.tell(sender, "%s&cThere was an issue while converting Holograms!", Common.PREFIX);
+                    return false;
+                }
+                
+                Common.tell(sender, "%s&aConversion complete!", Common.PREFIX);
+                Common.tell(sender, "%s&7Total: %d", Common.PREFIX, info.getTotal());
+                Common.tell(sender, "%s&aSuccessful: &7%d", Common.PREFIX, info.getConverted());
+                Common.tell(sender, "%s&eSkipped: &7%d", Common.PREFIX, info.getSkipped());
+                Common.tell(sender, "%s&cFailed: &7%d", Common.PREFIX, info.getFailed());
                 return true;
             };
         }

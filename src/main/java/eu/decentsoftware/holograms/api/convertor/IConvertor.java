@@ -1,5 +1,7 @@
 package eu.decentsoftware.holograms.api.convertor;
 
+import org.bukkit.command.CommandSender;
+
 import java.io.File;
 import java.util.List;
 
@@ -13,7 +15,7 @@ public interface IConvertor {
 	 *
 	 * @return Boolean whether the operation was successful.
 	 */
-	boolean convert();
+	ConvertorInfo convert(CommandSender sender);
 
 	/**
 	 * Convert holograms from the given file.
@@ -21,7 +23,7 @@ public interface IConvertor {
 	 * @param file Given file.
 	 * @return Boolean whether the operation was successful.
 	 */
-	boolean convert(File file);
+	ConvertorInfo convert(CommandSender sender, File file);
 
 	/**
 	 * Convert holograms from all the given files.
@@ -29,7 +31,7 @@ public interface IConvertor {
 	 * @param files Given files.
 	 * @return Boolean whether the operation was successful.
 	 */
-	boolean convert(File... files);
+	ConvertorInfo convert(CommandSender sender, File... files);
 	
 	/**
 	 * Convert the formatting of the lines into one that DecentHolograms can understand.

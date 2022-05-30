@@ -1,13 +1,16 @@
 package eu.decentsoftware.holograms.plugin.convertors;
 
+import eu.decentsoftware.holograms.api.utils.config.Configuration;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 public enum ConvertorType {
-	HOLOGRAPHIC_DISPLAYS("HolographicDisplays", "DH", "hd"),
+	CMI("CMI", "cmi"),
 	GHOLO("GHolo", "gholo", "gh"),
-	CMI("cmi");
+	HOLOGRAPHIC_DISPLAYS("HolographicDisplays", "DH", "hd");
 
 	public static ConvertorType fromString(String alias) {
 		for (ConvertorType convertorType : ConvertorType.values()) {
@@ -25,7 +28,7 @@ public enum ConvertorType {
 		this.name = name;
 		this.aliases = aliases == null ? Collections.emptyList() : Arrays.asList(aliases);
 	}
-
+	
 	public String getName() {
 		return name;
 	}

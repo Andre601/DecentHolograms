@@ -2,16 +2,17 @@ package eu.decentsoftware.holograms.plugin.convertors;
 
 import eu.decentsoftware.holograms.api.DecentHolograms;
 import eu.decentsoftware.holograms.api.DecentHologramsAPI;
+import eu.decentsoftware.holograms.api.convertor.ConvertorInfo;
 import eu.decentsoftware.holograms.api.convertor.IConvertor;
 import eu.decentsoftware.holograms.api.utils.Common;
 import eu.decentsoftware.holograms.api.utils.config.Configuration;
 import eu.decentsoftware.holograms.api.utils.location.LocationUtils;
 import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
 
 import java.io.File;
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -22,42 +23,49 @@ public class GHoloConverter implements IConvertor {
     private static final Pattern GRADIENT = Pattern.compile("\\[(#[0-9a-f]{6}) (\\w+) (#[0-9a-f]{6})]", Pattern.CASE_INSENSITIVE);
     
     @Override
-    public boolean convert(){
-        return convert(new File("plugins/GHolo/data/h.data"));
+    public ConvertorInfo convert(CommandSender sender){
+        return convert(sender, new File("plugins/GHolo/data/h.data"));
     }
     
     @Override
-    public boolean convert(File file) {
+    public ConvertorInfo convert(CommandSender sender, File file) {
         Common.log("Converting GHolo holograms...");
         if (!this.isFileValid(file)) {
-            Common.log("Invalid file! Need 'h.data'");
-            return false;
+            String fileName = file == null ? "UNKNOWN" : file.getName();
+    
+            Common.tell(sender, "%s&cInvalid file '%s' provided! Need 'h.data' from GHolo!", Common.PREFIX, fileName);
+            return ConvertorInfo.failedConvert();
         }
-        int count = 0;
+        int converted = 0;
+        int failed = 0;
         Configuration config = new Configuration(PLUGIN.getPlugin(), file);
         for (String name : config.getConfigurationSection("H").getKeys(false)) {
             String path = "H." + name;
             
             Location location = LocationUtils.asLocation(config.getString(path + ".l"));
             if(location == null){
-                Common.log(Level.WARNING, "Skipping hologram '%s' with null location...", name);
+                Common.tell(sender, "%s&cHologram '%s' had an invalid location!", Common.PREFIX, name);
+                ++failed;
                 continue;
             }
             
             List<String> lines = prepareLines(config.getStringList(path + ".c"));
             
-            count = ConverterCommon.createHologram(count, name, location, lines, PLUGIN);
+            converted = ConverterCommon.createHologram(converted, name, location, lines, PLUGIN);
         }
-        Common.log("Successfully converted %d GHolo holograms!", count);
-        return true;
+        return new ConvertorInfo(true, converted, 0, failed);
     }
     
     @Override
-    public boolean convert(File... files) {
+    public ConvertorInfo convert(CommandSender sender, File... files) {
+        int converted = 0;
+        int failed = 0;
         for (File file : files) {
-            this.convert(file);
+            ConvertorInfo info = this.convert(sender, file);
+            converted += info.getConverted();
+            failed += info.getFailed();
         }
-        return true;
+        return new ConvertorInfo(true, converted, 0, failed);
     }
     
     private boolean isFileValid(final File file) {
