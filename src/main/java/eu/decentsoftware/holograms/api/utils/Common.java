@@ -146,6 +146,14 @@ public class Common {
 				i1[0] == i2[0] && i1[1] > i2[1] || // Minor version is higher and major is the same.
 				i1[0] == i2[0] && i1[1] == i2[1] && i1[2] > i2[2]; // Major and minor versions are the same and patch is higher.
 	}
+	
+	public static int parseInt(String string) {
+		try {
+			return Integer.parseInt(string);
+		} catch (NumberFormatException e) {
+			return -1;
+		}
+	}
 
 	private static int[] splitVersion(String version) {
 		String[] spl = version == null ? null : version.split("\\.");
@@ -157,14 +165,6 @@ public class Common {
 			arr[i] = parseInt(spl[i]);
 		}
 		return arr;
-	}
-
-	private static int parseInt(String string) {
-		try {
-			return Integer.parseInt(string);
-		} catch (NumberFormatException e) {
-			return -1;
-		}
 	}
 
 	/**

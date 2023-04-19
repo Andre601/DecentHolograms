@@ -175,6 +175,43 @@ public class IridiumColorAPI {
     public static String stripColorFormatting(@Nonnull String string) {
         return string.replaceAll("[&§][a-f0-9lnokm]|<[/]?\\w{5,8}(:[0-9A-F]{6})?>", "");
     }
+    
+    /**
+     * Returns a gradient array of chat colors or just white if {@code step} is 1 or less.
+     *
+     * @param start The starting color.
+     * @param end   The ending color.
+     * @param step  How many colors we return.
+     * @author TheViperShow
+     * @since 1.0.0
+     */
+    @Nonnull
+    public static ChatColor[] createGradient(@Nonnull Color start, @Nonnull Color end, int step){
+        // Return just white if step is 1 or less. Prevents possible "/ by zero" exception.
+        if(step <= 1){
+            return new ChatColor[]{ChatColor.WHITE, ChatColor.WHITE, ChatColor.WHITE};
+        }
+        
+        ChatColor[] colors = new ChatColor[step];
+        int stepR = Math.abs(start.getRed() - end.getRed()) / (step - 1);
+        int stepG = Math.abs(start.getGreen() - end.getGreen()) / (step - 1);
+        int stepB = Math.abs(start.getBlue() - end.getBlue()) / (step - 1);
+        int[] direction = new int[]{
+            start.getRed() < end.getRed() ? +1 : -1,
+            start.getGreen() < end.getGreen() ? +1 : -1,
+            start.getBlue() < end.getBlue() ? +1 : -1
+        };
+        
+        for(int i = 0; i < step; i++){
+            Color color = new Color(start.getRed() + ((stepR * i) * direction[0]), start.getGreen() + ((stepG * i) * direction[1]), start.getBlue() + ((stepB * i) * direction[2]));
+            if(Version.supportsHex()){
+                colors[i] = METHOD_OF.invokeStatic(color);
+            }else{
+                colors[i] = getClosestColor(color);
+            }
+        }
+        return colors;
+    }
 
     /**
      * Returns a rainbow array of chat colors.
@@ -198,44 +235,6 @@ public class IridiumColorAPI {
         }
         return colors;
     }
-
-    /**
-     * Returns a gradient array of chat colors or just white if {@code step} is 1 or less.
-     *
-     * @param start The starting color.
-     * @param end   The ending color.
-     * @param step  How many colors we return.
-     * @author TheViperShow
-     * @since 1.0.0
-     */
-    @Nonnull
-    private static ChatColor[] createGradient(@Nonnull Color start, @Nonnull Color end, int step) {
-        // Return just white if step is 1 or less. Prevents possible "/ by zero" exception.
-        if (step <= 1) {
-            return new ChatColor[]{ChatColor.WHITE, ChatColor.WHITE, ChatColor.WHITE};
-        }
-        
-        ChatColor[] colors = new ChatColor[step];
-        int stepR = Math.abs(start.getRed() - end.getRed()) / (step - 1);
-        int stepG = Math.abs(start.getGreen() - end.getGreen()) / (step - 1);
-        int stepB = Math.abs(start.getBlue() - end.getBlue()) / (step - 1);
-        int[] direction = new int[]{
-                start.getRed() < end.getRed() ? +1 : -1,
-                start.getGreen() < end.getGreen() ? +1 : -1,
-                start.getBlue() < end.getBlue() ? +1 : -1
-        };
-
-        for (int i = 0; i < step; i++) {
-            Color color = new Color(start.getRed() + ((stepR * i) * direction[0]), start.getGreen() + ((stepG * i) * direction[1]), start.getBlue() + ((stepB * i) * direction[2]));
-            if (Version.supportsHex()) {
-                colors[i] = METHOD_OF.invokeStatic(color);
-            } else {
-                colors[i] = getClosestColor(color);
-            }
-        }
-        return colors;
-    }
-
 
     /**
      * Returns the closest legacy color from an rgb color
