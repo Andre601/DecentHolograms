@@ -247,7 +247,10 @@ public class Hologram extends UpdatingHologramObject implements ITicked {
     protected boolean defaultVisibleState = true;
     protected final DList<HologramPage> pages = new DList<>();
     protected boolean downOrigin = Settings.DEFAULT_DOWN_ORIGIN;
-    protected boolean alwaysFacePlayer = false;
+    /**
+     * @deprecated This method does nothing in DecentHolograms anymore and may be removed in the future.
+     */
+    @Deprecated protected boolean alwaysFacePlayer = false;
     private final AtomicInteger tickCounter;
 
     /*
